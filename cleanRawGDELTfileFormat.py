@@ -22,13 +22,14 @@ for fileName in fileNames:
     for line in lines:
         line = line.rstrip('\n')
         cells = line.split(',')
-        
-        if len(cells) == 12:
-            line = line + '\n'
-        else:
-            line = ','.join(cells[:8]) + ',MALFORMED.com,' + ','.join(cells[-3:]) + '\n'
-        
-        outLines = outLines + line
+
+        if ((cells[0] == 'US') or (cells[1] == 'US')):
+            if len(cells) == 12:
+                line = line + '\n'
+            else:
+                line = ','.join(cells[:8]) + ',MALFORMED.com,' + ','.join(cells[-3:]) + '\n'
+            
+            outLines = outLines + line
         #print(line)
     
     outFolderPath = 'data/news/processed/original/GDELT_results_cleaned'
