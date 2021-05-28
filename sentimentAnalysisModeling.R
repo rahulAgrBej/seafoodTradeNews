@@ -22,11 +22,38 @@ for (fileIdx in 1:1) {
 
 # calculating sentiment scores
 # overall sentiment = posCount - negCount
-# classify sentiment = +ve only positive words, -VE only negative words, neutral if no sentiment words
+# classify sentiment = +ve only positive words, -VE only negative words, neutral if no sentiment words, mixed if both positive and negative words
 df <- df %>%
   mutate(overall_sentiment = posCount - negCount) %>%
   mutate(classify_sentiment = case_when(
     (posCount > 0) & (negCount == 0) ~ 1,
     (posCount == 0) & (negCount > 0) ~ -1,
-    (posCount == 0) & (negCount == 0) ~ 0
+    (posCount == 0) & (negCount == 0) ~ 0,
+    (posCount > 0) & (negCount > 0) ~ 2
   ))
+
+
+classifiedPosArticles <- df %>%
+  filter(classify_sentiment == 1) %>%
+  group_by(country, year, month) %>%
+  summarize(posClassified = n())
+
+classifiedNegArticles <- df %>%
+  filter(classify_sentiment == -1) %>%
+  group_by(country, year, month) %>%
+  summarize(negClassified = n())
+
+overallPosArticles <- df %>%
+  filter(overall_sentiment < 0) %>%
+  group_by(country, year, month) %>%
+  summarize(posOverall = n())
+
+overallNegArticles <- df %>%
+  filter(overall_sentiment > 0) %>%
+  group_by(country, year, month) %>%
+  summarize(negOverall = n())
+
+overallCounts <- df %>%
+  group_by(country, year, month) %>%
+  summarize(rawArticlCount = n())
+  
