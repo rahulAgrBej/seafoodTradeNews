@@ -2,14 +2,117 @@
 import pandas as pd
 import pprint as pp
 
-path = 'data/original/tradeNews.csv'
+def zeroShifts(keylist, data):
+    for k in keylist:
+        data[k] = [0] * len(data)
+    return data
+
+def shiftData(originalKeyList, forwardKeyList, backKeyList, countryData, newsShiftData):
+    print(originalKeyList)
+    print(forwardKeyList)
+    print(backKeyList)
+    for originalKey in originalKeyList:
+        #print(originalKey)
+        it = 0
+        for forwardKey in forwardKeyList:
+            forwardIt = (it % 3) + 1
+            #print(f'{forwardKey} , {forwardIt}')
+            forwardInsert = ([0] * forwardIt) + list(countryData[originalKey][:-forwardIt])
+            newsShiftData[forwardKey].extend(forwardInsert)
+            it += 1
+
+        it = 0
+        for backKey in backKeyList:
+            backIt = (it % 3) + 1
+            #print(f'{backKey} , {backIt}')
+            backInsert = list(countryData[originalKey][backIt:]) + ([0] * backIt)
+            newsShiftData[backKey].extend(backInsert)
+            it += 1
+        
+        newsShiftData[originalKey].extend(countryData[originalKey])
+
+    return newsShiftData
+
+path = 'data/original/tradeNewsSentiment.csv'
 data = pd.read_csv(path)
-data['NEWS_FORWARD_1'] = [0] * len(data)
-data['NEWS_FORWARD_2'] = [0] * len(data)
-data['NEWS_FORWARD_3'] = [0] * len(data)
-data['NEWS_BACK_1'] = [0] * len(data)
-data['NEWS_BACK_2'] = [0] * len(data)
-data['NEWS_BACK_3'] = [0] * len(data)
+keylist = [
+    'NEWS_FORWARD_1',
+    'NEWS_FORWARD_2',
+    'NEWS_FORWARD_3',
+    'NEWS_BACK_1',
+    'NEWS_BACK_2',
+    'NEWS_BACK_3',
+    'POS_OVERALL_FORWARD_1',
+    'POS_OVERALL_FORWARD_2',
+    'POS_OVERALL_FORWARD_3',
+    'NEG_OVERALL_FORWARD_1',
+    'NEG_OVERALL_FORWARD_2',
+    'NEG_OVERALL_FORWARD_3',
+    'POS_OVERALL_BACK_1',
+    'POS_OVERALL_BACK_2',
+    'POS_OVERALL_BACK_3',
+    'NEG_OVERALL_BACK_1',
+    'NEG_OVERALL_BACK_2',
+    'NEG_OVERALL_BACK_3',
+    'POS_CLASS_FORWARD_1',
+    'POS_CLASS_FORWARD_2',
+    'POS_CLASS_FORWARD_3',
+    'NEG_CLASS_FORWARD_1',
+    'NEG_CLASS_FORWARD_2',
+    'NEG_CLASS_FORWARD_3',
+    'POS_CLASS_BACK_1',
+    'POS_CLASS_BACK_2',
+    'POS_CLASS_BACK_3',
+    'NEG_CLASS_BACK_1',
+    'NEG_CLASS_BACK_2',
+    'NEG_CLASS_BACK_3'
+]
+
+originalKeyList = [
+    'NEWS_NO_SHIFT',
+    'POS_OVERALL',
+    'POS_CLASS',
+    'NEG_OVERALL',
+    'NEG_CLASS'
+]
+
+forwardKeyList = [
+    'NEWS_FORWARD_1',
+    'NEWS_FORWARD_2',
+    'NEWS_FORWARD_3',
+    'POS_OVERALL_FORWARD_1',
+    'POS_OVERALL_FORWARD_2',
+    'POS_OVERALL_FORWARD_3',
+    'POS_CLASS_FORWARD_1',
+    'POS_CLASS_FORWARD_2',
+    'POS_CLASS_FORWARD_3',
+    'NEG_OVERALL_FORWARD_1',
+    'NEG_OVERALL_FORWARD_2',
+    'NEG_OVERALL_FORWARD_3',
+    'NEG_CLASS_FORWARD_1',
+    'NEG_CLASS_FORWARD_2',
+    'NEG_CLASS_FORWARD_3'
+]
+
+backKeyList = [
+    'NEWS_BACK_1',
+    'NEWS_BACK_2',
+    'NEWS_BACK_3',
+    'POS_OVERALL_BACK_1',
+    'POS_OVERALL_BACK_2',
+    'POS_OVERALL_BACK_3',
+    'POS_CLASS_BACK_1',
+    'POS_CLASS_BACK_2',
+    'POS_CLASS_BACK_3',
+    'NEG_OVERALL_BACK_1',
+    'NEG_OVERALL_BACK_2',
+    'NEG_OVERALL_BACK_3',
+    'NEG_CLASS_BACK_1',
+    'NEG_CLASS_BACK_2',
+    'NEG_CLASS_BACK_3'
+]
+
+data = zeroShifts(keylist, data)
 print(data)
 print(len(data))
 
@@ -20,6 +123,10 @@ newsShiftData = {
         'YEAR': [],
         'MONTH': [],
         'NEWS_NO_SHIFT': [],
+        'POS_OVERALL': [],
+        'POS_CLASS': [],
+        'NEG_OVERALL': [],
+        'NEG_CLASS': [],
         'CTY_NAME': [],
         'MONTH_IDX': [],
         'TRADE_SHOCK': [],
@@ -28,37 +135,59 @@ newsShiftData = {
         'NEWS_FORWARD_3': [],
         'NEWS_BACK_1': [],
         'NEWS_BACK_2': [],
-        'NEWS_BACK_3': []
+        'NEWS_BACK_3': [],
+        'POS_OVERALL_FORWARD_1': [],
+        'POS_OVERALL_FORWARD_2': [],
+        'POS_OVERALL_FORWARD_3': [],
+        'NEG_OVERALL_FORWARD_1': [],
+        'NEG_OVERALL_FORWARD_2': [],
+        'NEG_OVERALL_FORWARD_3': [],
+        'POS_OVERALL_BACK_1': [],
+        'POS_OVERALL_BACK_2': [],
+        'POS_OVERALL_BACK_3': [],
+        'NEG_OVERALL_BACK_1': [],
+        'NEG_OVERALL_BACK_2': [],
+        'NEG_OVERALL_BACK_3': [],
+        'POS_CLASS_FORWARD_1': [],
+        'POS_CLASS_FORWARD_2': [],
+        'POS_CLASS_FORWARD_3': [],
+        'NEG_CLASS_FORWARD_1': [],
+        'NEG_CLASS_FORWARD_2': [],
+        'NEG_CLASS_FORWARD_3': [],
+        'POS_CLASS_BACK_1': [],
+        'POS_CLASS_BACK_2': [],
+        'POS_CLASS_BACK_3': [],
+        'NEG_CLASS_BACK_1': [],
+        'NEG_CLASS_BACK_2': [],
+        'NEG_CLASS_BACK_3': []
     }
 
 
-for country in countries:
+for country in countries[:1]:
     countryIdx = (data['CTY_NAME'] == country)
     countryData = data[countryIdx]
-    newsForward1 = ([0] * 1) + list(countryData['NEWS_NO_SHIFT'][:-1])
-    newsForward2 = ([0] * 2) + list(countryData['NEWS_NO_SHIFT'][:-2])
-    newsForward3 = ([0] * 3) + list(countryData['NEWS_NO_SHIFT'][:-3])
-    newsBack1 = list(countryData['NEWS_NO_SHIFT'][1:]) + ([0] * 1)
-    newsBack2 = list(countryData['NEWS_NO_SHIFT'][2:]) + ([0] * 2)
-    newsBack3 = list(countryData['NEWS_NO_SHIFT'][3:]) + ([0] * 3)
+    itStart = 0
+    for originalKey in originalKeyList:
+        newsShiftData = shiftData([originalKey], forwardKeyList[itStart:itStart+3], backKeyList[itStart:itStart+3], countryData, newsShiftData)
+        itStart += 3
     
+
+    newsShiftData['CTY_NAME'].extend(countryData['CTY_NAME'])
     newsShiftData['YEAR'].extend(countryData['YEAR'])
     newsShiftData['MONTH'].extend(countryData['MONTH'])
-    newsShiftData['NEWS_NO_SHIFT'].extend(countryData['NEWS_NO_SHIFT'])
-    newsShiftData['CTY_NAME'].extend(countryData['CTY_NAME'])
     newsShiftData['MONTH_IDX'].extend(countryData['MONTH_IDX'])
     newsShiftData['TRADE_SHOCK'].extend(countryData['TRADE_SHOCK'])
-    newsShiftData['NEWS_FORWARD_1'].extend(newsForward1)
-    newsShiftData['NEWS_FORWARD_2'].extend(newsForward2)
-    newsShiftData['NEWS_FORWARD_3'].extend(newsForward3)
-    newsShiftData['NEWS_BACK_1'].extend(newsBack1)
-    newsShiftData['NEWS_BACK_2'].extend(newsBack2)
-    newsShiftData['NEWS_BACK_3'].extend(newsBack3)
 
 print('HERE')
 print(len(newsShiftData['CTY_NAME']))
-print(newsShiftData.keys())
+#print(newsShiftData.keys())
+print('asdkfjaskldfjlkasdjfkla')
+for k in newsShiftData.keys():
+    print(f'{k} : {len(newsShiftData[k])}')
+
+#print(newsShiftData)
 newDataWithShifts = pd.DataFrame(data=newsShiftData)
 
-dataWithShiftsPath = 'data/original/tradeNewsShifts.csv'
+
+dataWithShiftsPath = 'data/original/tradeNewsShiftsSentiment.csv'
 newDataWithShifts.to_csv(dataWithShiftsPath, index=False)
